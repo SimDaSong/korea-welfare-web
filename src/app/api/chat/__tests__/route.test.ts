@@ -20,6 +20,9 @@ vi.mock('ai', () => ({
     ),
   }),
   stepCountIs: vi.fn().mockReturnValue('stepCountIs(5)'),
+  convertToModelMessages: vi.fn().mockResolvedValue([
+    { role: 'user', content: 'converted message' },
+  ]),
 }));
 
 vi.mock('@ai-sdk/openai', () => ({
@@ -29,7 +32,7 @@ vi.mock('@ai-sdk/openai', () => ({
 import { POST } from '../route';
 import { createMCPClient } from '@ai-sdk/mcp';
 import { Experimental_StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio';
-import { streamText, stepCountIs } from 'ai';
+import { streamText, stepCountIs, convertToModelMessages } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 function createMockRequest(body: object): Request {
@@ -83,17 +86,20 @@ describe('POST /api/chat', () => {
     expect(mcpClient.tools).toHaveBeenCalledOnce();
   });
 
-  it('streamText에 올바른 파라미터를 전달한다', async () => {
-    const messages = [{ role: 'user', content: '출산 지원금 알려줘' }];
-    const req = createMockRequest({ messages });
+  it('UI 메시지를 모델 메시지로 변환하여 streamText에 전달한다', async () => {
+    const uiMessages = [{ role: 'user', content: '출산 지원금 알려줘' }];
+    const convertedMessages = [{ role: 'user', content: 'converted message' }];
+    vi.mocked(convertToModelMessages).mockResolvedValueOnce(convertedMessages as any);
 
+    const req = createMockRequest({ messages: uiMessages });
     await POST(req);
 
+    expect(convertToModelMessages).toHaveBeenCalledWith(uiMessages);
     expect(openai).toHaveBeenCalledWith('gpt-4o-mini');
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'gpt-4o-mini-model',
-        messages,
+        messages: convertedMessages,
         tools: expect.any(Object),
         stopWhen: 'stepCountIs(5)',
       })
@@ -168,9 +174,58 @@ describe('POST /api/chat', () => {
       messages: [{ role: 'user', content: '테스트' }],
     });
 
-    await expect(POST(req)).rejects.toThrow('LLM 호출 실패');
+    const response = await POST(req);
 
+    expect(response.status).toBe(500);
     const mcpClient = await getMCPClientMock();
     expect(mcpClient.close).toHaveBeenCalledOnce();
+  });
+
+  it('insufficient_quota 에러 시 503 응답을 반환한다', async () => {
+    vi.mocked(streamText).mockImplementationOnce(() => {
+      throw new Error('insufficient_quota: You exceeded your current quota');
+    });
+
+    const req = createMockRequest({
+      messages: [{ role: 'user', content: '테스트' }],
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(body.error).toContain('크레딧이 부족');
+  });
+
+  it('invalid_api_key 에러 시 401 응답을 반환한다', async () => {
+    vi.mocked(streamText).mockImplementationOnce(() => {
+      throw new Error('invalid_api_key: The API key provided is invalid');
+    });
+
+    const req = createMockRequest({
+      messages: [{ role: 'user', content: '테스트' }],
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error).toContain('API 키');
+  });
+
+  it('일반 에러 시 500 응답과 안내 메시지를 반환한다', async () => {
+    vi.mocked(streamText).mockImplementationOnce(() => {
+      throw new Error('unexpected failure');
+    });
+
+    const req = createMockRequest({
+      messages: [{ role: 'user', content: '테스트' }],
+    });
+
+    const response = await POST(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toContain('일시적인 문제');
   });
 });

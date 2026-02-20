@@ -1,4 +1,4 @@
-import { streamText, stepCountIs } from 'ai';
+import { streamText, stepCountIs, convertToModelMessages } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { createMCPClient } from '@ai-sdk/mcp';
 import { Experimental_StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio';
@@ -18,23 +18,26 @@ function buildSystemPrompt(lang: Language): string {
 }
 
 export async function POST(req: Request) {
-  const { messages, lang = 'ko' } = await req.json();
-
-  const mcpClient = await createMCPClient({
-    transport: new Experimental_StdioMCPTransport({
-      command: 'node',
-      args: [
-        'node_modules/korea-welfare-mcp-server/dist/index.js',
-      ],
-      env: {
-        ...process.env as Record<string, string>,
-        PUBLIC_DATA_API_KEY: process.env.PUBLIC_DATA_API_KEY!,
-        YOUTHCENTER_API_KEY: process.env.YOUTHCENTER_API_KEY ?? '',
-      },
-    }),
-  });
+  let mcpClient;
 
   try {
+    const { messages: uiMessages, lang = 'ko' } = await req.json();
+    const messages = await convertToModelMessages(uiMessages);
+
+    mcpClient = await createMCPClient({
+      transport: new Experimental_StdioMCPTransport({
+        command: 'node',
+        args: [
+          'node_modules/korea-welfare-mcp-server/dist/index.js',
+        ],
+        env: {
+          ...process.env as Record<string, string>,
+          PUBLIC_DATA_API_KEY: process.env.PUBLIC_DATA_API_KEY!,
+          YOUTHCENTER_API_KEY: process.env.YOUTHCENTER_API_KEY ?? '',
+        },
+      }),
+    });
+
     const tools = await mcpClient.tools();
 
     const result = streamText({
@@ -46,7 +49,28 @@ export async function POST(req: Request) {
     });
 
     return result.toTextStreamResponse();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    if (message.includes('insufficient_quota')) {
+      return Response.json(
+        { error: 'OpenAI API 크레딧이 부족합니다. 관리자에게 문의해주세요.' },
+        { status: 503 },
+      );
+    }
+    if (message.includes('invalid_api_key') || message.includes('Incorrect API key')) {
+      return Response.json(
+        { error: 'API 키가 유효하지 않습니다.' },
+        { status: 401 },
+      );
+    }
+
+    console.error('[chat] Error:', message);
+    return Response.json(
+      { error: '서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.' },
+      { status: 500 },
+    );
   } finally {
-    await mcpClient.close();
+    await mcpClient?.close();
   }
 }
