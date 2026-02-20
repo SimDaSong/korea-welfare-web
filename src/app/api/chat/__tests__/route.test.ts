@@ -50,7 +50,6 @@ describe('POST /api/chat', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // 매 테스트마다 mock 재설정
     vi.mocked(createMCPClient).mockResolvedValue({
       tools: vi.fn().mockResolvedValue({
         welfare_search_benefits: { description: '복지 검색' },
@@ -102,7 +101,7 @@ describe('POST /api/chat', () => {
     expect(stepCountIs).toHaveBeenCalledWith(5);
   });
 
-  it('시스템 프롬프트에 한국어 복지 안내가 포함된다', async () => {
+  it('lang이 없으면 기본 한국어 시스템 프롬프트를 사용한다', async () => {
     const req = createMockRequest({
       messages: [{ role: 'user', content: '테스트' }],
     });
@@ -112,6 +111,30 @@ describe('POST /api/chat', () => {
     const callArgs = vi.mocked(streamText).mock.calls[0][0];
     expect(callArgs.system).toContain('한국 복지 혜택');
     expect(callArgs.system).toContain('한국어');
+  });
+
+  it('lang=en이면 영어 응답 지시문이 포함된다', async () => {
+    const req = createMockRequest({
+      messages: [{ role: 'user', content: 'test' }],
+      lang: 'en',
+    });
+
+    await POST(req);
+
+    const callArgs = vi.mocked(streamText).mock.calls[0][0];
+    expect(callArgs.system).toContain('English');
+  });
+
+  it('lang=ja이면 일본어 응답 지시문이 포함된다', async () => {
+    const req = createMockRequest({
+      messages: [{ role: 'user', content: 'テスト' }],
+      lang: 'ja',
+    });
+
+    await POST(req);
+
+    const callArgs = vi.mocked(streamText).mock.calls[0][0];
+    expect(callArgs.system).toContain('日本語');
   });
 
   it('스트리밍 응답을 반환한다', async () => {
