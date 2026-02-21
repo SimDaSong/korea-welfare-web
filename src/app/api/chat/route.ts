@@ -152,7 +152,6 @@ export async function POST(req: Request) {
     return result.toUIMessageStreamResponse({
       /** 스트리밍 중 에러 발생 시 사용자에게 보여줄 메시지 반환 */
       onError(error) {
-        console.error('[chat] Stream error:', error);
         mcpClient?.close();
         return formatStreamError(error);
       },
@@ -161,7 +160,6 @@ export async function POST(req: Request) {
     /* MCP 연결 실패, JSON 파싱 실패 등 스트리밍 이전 에러 */
     await mcpClient?.close();
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[chat] Error:', message);
     return Response.json(
       { error: formatStreamError(error) },
       { status: 500 },
