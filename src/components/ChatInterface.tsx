@@ -103,7 +103,9 @@ export default function ChatInterface() {
                     />
                   );
                 })}
-                {status === 'submitted' && (
+                {isLoading && !messages.some(
+                  (m) => m.role === 'assistant' && status === 'streaming' && getTextFromParts(m.parts as Array<{ type: string; text?: string }>)
+                ) && (
                   <div className="flex justify-start">
                     <div className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">
                       <span>{t.searching}</span>
