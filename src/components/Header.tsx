@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import InfoPopover from './InfoPopover';
 
 interface HeaderProps {
   t: Translations;
@@ -29,18 +30,21 @@ export default function Header({ t, lang, onLanguageChange, onReset }: HeaderPro
             {t.badge}
           </Badge>
         </button>
-        <Select value={lang} onValueChange={(v) => onLanguageChange(v as Language)}>
-          <SelectTrigger size="sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {LANGUAGES.map((l) => (
-              <SelectItem key={l} value={l}>
-                {LANGUAGE_LABELS[l]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-1">
+          <InfoPopover t={t} />
+          <Select value={lang} onValueChange={(v) => onLanguageChange(v as Language)}>
+            <SelectTrigger size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map((l) => (
+                <SelectItem key={l} value={l}>
+                  {LANGUAGE_LABELS[l]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </header>
   );

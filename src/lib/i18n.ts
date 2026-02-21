@@ -24,6 +24,10 @@ const translations = {
       '출산 지원금 종류가 뭐가 있어?',
       '실업급여 신청 방법 알려줘',
     ],
+    notice: '현재 시범 운영 중이며, 요청 한도가 빠르게 소진될 수 있습니다. 한도 초과 시 일정 시간 동안 서비스 이용이 제한됩니다.',
+    reportIssue: '이슈 제보',
+    contact: '문의',
+    buyCoffee: '개발자에게 커피 사주기',
   },
   en: {
     title: 'Welfare Benefits Search',
@@ -40,6 +44,10 @@ const translations = {
       'What childbirth subsidies are available?',
       'How to apply for unemployment benefits?',
     ],
+    notice: 'This service is in beta. Request limits may be reached quickly. If exceeded, the service will be temporarily unavailable.',
+    reportIssue: 'Report an issue',
+    contact: 'Contact',
+    buyCoffee: 'Buy me a coffee',
   },
   ja: {
     title: '福祉給付検索',
@@ -56,6 +64,10 @@ const translations = {
       '出産支援金の種類は？',
       '失業給付の申請方法を教えて',
     ],
+    notice: '現在ベータ運用中です。リクエスト制限に達する場合があります。制限を超えると一時的にサービスをご利用いただけません。',
+    reportIssue: '問題を報告',
+    contact: 'お問い合わせ',
+    buyCoffee: '開発者にコーヒーをおごる',
   },
   zh: {
     title: '福利搜索',
@@ -72,6 +84,10 @@ const translations = {
       '生育补贴有哪些种类？',
       '如何申请失业救济金？',
     ],
+    notice: '目前处于测试阶段，请求额度可能很快用完。超出额度后，服务将暂时不可用。',
+    reportIssue: '报告问题',
+    contact: '联系我们',
+    buyCoffee: '请开发者喝杯咖啡',
   },
 };
 
@@ -85,6 +101,10 @@ export interface Translations {
   searching: string;
   error: string;
   suggestions: readonly string[];
+  notice: string;
+  reportIssue: string;
+  contact: string;
+  buyCoffee: string;
 }
 
 export function getTranslations(lang: Language): Translations {

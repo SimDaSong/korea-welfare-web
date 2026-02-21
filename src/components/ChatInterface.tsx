@@ -4,6 +4,7 @@ import { useChat } from '@ai-sdk/react';
 import { useRef, useEffect, useState } from 'react';
 import MessageBubble from './MessageBubble';
 import SuggestedQuestions from './SuggestedQuestions';
+import ServiceNotice from './ServiceNotice';
 import Header from './Header';
 import { getTranslations, type Language } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
@@ -87,6 +88,7 @@ export default function ChatInterface() {
                   suggestions={t.suggestions}
                   onSelect={(q) => send(q)}
                 />
+                <ServiceNotice t={t} />
               </div>
             ) : (
               <>
