@@ -14,20 +14,21 @@ interface HeaderProps {
   t: Translations;
   lang: Language;
   onLanguageChange: (lang: Language) => void;
+  onReset: () => void;
 }
 
-export default function Header({ t, lang, onLanguageChange }: HeaderProps) {
+export default function Header({ t, lang, onLanguageChange, onReset }: HeaderProps) {
   return (
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-        <div className="flex items-center">
+        <button type="button" onClick={onReset} className="flex items-center cursor-pointer hover:opacity-70 transition-opacity">
           <h1 className="text-lg font-bold text-foreground">
             {t.title}
           </h1>
           <Badge className="ml-2 bg-primary/10 text-primary hover:bg-primary/10">
             {t.badge}
           </Badge>
-        </div>
+        </button>
         <Select value={lang} onValueChange={(v) => onLanguageChange(v as Language)}>
           <SelectTrigger size="sm">
             <SelectValue />

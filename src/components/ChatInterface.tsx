@@ -25,7 +25,7 @@ export default function ChatInterface() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, setMessages, sendMessage, status } = useChat({
     onError(error) {
       setErrorMessage(error.message || t.error);
     },
@@ -38,6 +38,12 @@ export default function ChatInterface() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, errorMessage]);
+
+  const handleReset = () => {
+    setMessages([]);
+    setInput('');
+    setErrorMessage(null);
+  };
 
   const send = (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -60,7 +66,7 @@ export default function ChatInterface() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <Header t={t} lang={lang} onLanguageChange={setLang} />
+      <Header t={t} lang={lang} onLanguageChange={setLang} onReset={handleReset} />
 
       {/* 메시지 영역 */}
       <ScrollArea className="flex-1">
