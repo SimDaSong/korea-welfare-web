@@ -25,6 +25,7 @@ const translations = {
       '실업급여 신청 방법 알려줘',
     ],
     notice: '현재 시범 운영 중이며, 요청 한도가 빠르게 소진될 수 있습니다. 한도 초과 시 일정 시간 동안 서비스 이용이 제한됩니다.',
+    disclaimer: '대화 내용은 저장되지 않습니다. AI 답변은 부정확할 수 있으니 반드시 관련 기관에 직접 문의하고, 참고용으로만 활용하세요.',
     reportIssue: '이슈 제보',
     contact: '문의',
     buyCoffee: '개발자에게 커피 사주기',
@@ -45,6 +46,7 @@ const translations = {
       'How to apply for unemployment benefits?',
     ],
     notice: 'This service is in beta. Request limits may be reached quickly. If exceeded, the service will be temporarily unavailable.',
+    disclaimer: 'Conversations are not stored. AI responses may be inaccurate — always contact the relevant authority directly and use this for reference only.',
     reportIssue: 'Report an issue',
     contact: 'Contact',
     buyCoffee: 'Buy me a coffee',
@@ -65,6 +67,7 @@ const translations = {
       '失業給付の申請方法を教えて',
     ],
     notice: '現在ベータ運用中です。リクエスト制限に達する場合があります。制限を超えると一時的にサービスをご利用いただけません。',
+    disclaimer: '会話内容は保存されません。AIの回答は不正確な場合があります。必ず関係機関に直接お問い合わせのうえ、参考としてご利用ください。',
     reportIssue: '問題を報告',
     contact: 'お問い合わせ',
     buyCoffee: '開発者にコーヒーをおごる',
@@ -85,6 +88,7 @@ const translations = {
       '如何申请失业救济金？',
     ],
     notice: '目前处于测试阶段，请求额度可能很快用完。超出额度后，服务将暂时不可用。',
+    disclaimer: '对话内容不会被保存。AI回答可能存在误差，请务必直接联系相关机构，仅供参考使用。',
     reportIssue: '报告问题',
     contact: '联系我们',
     buyCoffee: '请开发者喝杯咖啡',
@@ -102,6 +106,7 @@ export interface Translations {
   error: string;
   suggestions: readonly string[];
   notice: string;
+  disclaimer: string;
   reportIssue: string;
   contact: string;
   buyCoffee: string;

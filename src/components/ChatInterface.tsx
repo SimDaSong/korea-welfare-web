@@ -148,6 +148,9 @@ export default function ChatInterface() {
             {t.send}
           </Button>
         </form>
+        <p className="mx-auto mt-2 max-w-3xl text-center text-xs text-muted-foreground">
+          {t.disclaimer}
+        </p>
       </div>
     </div>
   );
