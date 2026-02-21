@@ -48,6 +48,14 @@ export default function InfoPopover({ t }: InfoPopoverProps) {
             >
               {t.buyCoffee}
             </a>
+            <a
+              href={LINKS.mcpServer}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline underline-offset-2 hover:text-primary/80"
+            >
+              {t.mcpServer}
+            </a>
           </div>
         </div>
       </PopoverContent>

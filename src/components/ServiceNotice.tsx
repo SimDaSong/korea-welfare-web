@@ -34,6 +34,15 @@ export default function ServiceNotice({ t }: ServiceNoticeProps) {
         >
           {t.buyCoffee}
         </a>
+        <span className="text-border">|</span>
+        <a
+          href={LINKS.mcpServer}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          {t.mcpServer}
+        </a>
       </div>
     </div>
   );
