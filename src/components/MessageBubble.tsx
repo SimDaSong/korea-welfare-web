@@ -23,7 +23,7 @@ export default function MessageBubble({ role, content, variant = 'default' }: Me
         {isUser ? (
           <p className="whitespace-pre-wrap">{content}</p>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none prose-h2:mt-6 prose-h3:mt-5 prose-hr:my-4">
+          <div className="prose prose-sm dark:prose-invert max-w-none prose-h2:text-base prose-h2:mt-5 prose-h3:text-sm prose-h3:font-semibold prose-h3:mt-4 prose-hr:my-3">
             <Markdown
               components={{
                 a: ({ children, href, ...props }) => (

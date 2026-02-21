@@ -44,10 +44,23 @@ const BASE_SYSTEM_PROMPT = `당신은 한국 복지 혜택 검색을 도와주�
 - 선택 파라미터는 사용자가 명시한 경우에만 전달. 모르면 생략 (추측 금지)
 - response_format은 항상 "markdown"으로 전달
 
-## 응답 규칙
-- 검색 결과에서 핵심 정보(서비스명, 대상, 지원내용, 신청방법)를 정리
+## 응답 포맷 (반드시 준수)
+- 서비스/혜택을 나열할 때, 각 항목 사이에 반드시 "---" (수평선)을 넣어 시각적으로 구분
+- 각 항목은 "### 서비스명" 제목으로 시작
+- 핵심 정보(대상, 지원내용, 신청방법)를 간결하게 정리
 - 사용자의 상황에 맞는 추천 제공
-- 불확실한 정보는 공식 사이트 확인을 안내`;
+- 불확실한 정보는 공식 사이트 확인을 안내
+
+예시:
+### 1. 첫째아이 출산지원금
+- **대상**: ...
+- **지원내용**: ...
+
+---
+
+### 2. 둘째아이 출산지원금
+- **대상**: ...
+- **지원내용**: ...`;
 
 function buildSystemPrompt(lang: Language): string {
   return `${BASE_SYSTEM_PROMPT}\n- ${LANGUAGE_INSTRUCTIONS[lang]}`;
@@ -58,13 +71,10 @@ function formatStreamError(error: unknown): string {
   const msg = error instanceof Error ? error.message : String(error);
 
   if (msg.includes('insufficient_quota') || msg.includes('exceeded your current quota')) {
-    return '일일 요청 한도를 모두 소진하였습니다. 내일 다시 시도해주세요.';
-  }
-  if (msg.includes('invalid_api_key') || msg.includes('Incorrect API key')) {
-    return '현재 서비스를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.';
+    return '요청 한도를 모두 소진하였습니다.';
   }
 
-  return '서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  return '서비스에 일시적인 문제가 발생했습니다.';
 }
 
 export async function POST(req: Request) {
