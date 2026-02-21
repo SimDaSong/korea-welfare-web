@@ -19,7 +19,13 @@ export default function ChatInterface() {
   const [lang, setLang] = useState<Language>('ko');
   const t = getTranslations(lang);
 
-  const { messages, sendMessage, status, error } = useChat();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { messages, sendMessage, status } = useChat({
+    onError(error) {
+      setErrorMessage(error.message || t.error);
+    },
+  });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -27,10 +33,11 @@ export default function ChatInterface() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, errorMessage]);
 
   const send = (text: string) => {
     if (!text.trim() || isLoading) return;
+    setErrorMessage(null);
     sendMessage({ text }, { body: { lang } });
   };
 
@@ -89,18 +96,15 @@ export default function ChatInterface() {
                   </div>
                 </div>
               )}
+              {/* 에러를 어시스턴트 채팅 메시지로 표시 */}
+              {errorMessage && (
+                <MessageBubble role="assistant" content={errorMessage} />
+              )}
             </>
           )}
           <div ref={messagesEndRef} />
         </div>
       </div>
-
-      {/* 에러 표시 */}
-      {error && (
-        <div className="border-t border-red-200 bg-red-50 px-4 py-2 text-center text-sm text-red-600 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
-          {t.error}
-        </div>
-      )}
 
       {/* 입력 영역 */}
       <div className="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-950">

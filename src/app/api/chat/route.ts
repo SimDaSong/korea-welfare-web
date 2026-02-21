@@ -17,6 +17,20 @@ function buildSystemPrompt(lang: Language): string {
   return `${BASE_SYSTEM_PROMPT}\n- ${LANGUAGE_INSTRUCTIONS[lang]}`;
 }
 
+/** 스트리밍 에러를 사용자 친화적 메시지로 변환 */
+function formatStreamError(error: unknown): string {
+  const msg = error instanceof Error ? error.message : String(error);
+
+  if (msg.includes('insufficient_quota') || msg.includes('exceeded your current quota')) {
+    return '일일 요청 한도를 모두 소진하였습니다. 내일 다시 시도해주세요.';
+  }
+  if (msg.includes('invalid_api_key') || msg.includes('Incorrect API key')) {
+    return '현재 서비스를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.';
+  }
+
+  return '서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+}
+
 export async function POST(req: Request) {
   let mcpClient;
 
@@ -46,31 +60,28 @@ export async function POST(req: Request) {
       messages,
       tools,
       stopWhen: stepCountIs(5),
+      /** 스트리밍 완료 후 MCP 클라이언트 정리 */
+      onFinish() {
+        mcpClient?.close();
+      },
     });
 
-    return result.toTextStreamResponse();
+    return result.toUIMessageStreamResponse({
+      /** 스트리밍 중 에러 발생 시 사용자에게 보여줄 메시지 반환 */
+      onError(error) {
+        console.error('[chat] Stream error:', error);
+        mcpClient?.close();
+        return formatStreamError(error);
+      },
+    });
   } catch (error) {
+    /* MCP 연결 실패, JSON 파싱 실패 등 스트리밍 이전 에러 */
+    await mcpClient?.close();
     const message = error instanceof Error ? error.message : String(error);
-
-    if (message.includes('insufficient_quota')) {
-      return Response.json(
-        { error: 'OpenAI API 크레딧이 부족합니다. 관리자에게 문의해주세요.' },
-        { status: 503 },
-      );
-    }
-    if (message.includes('invalid_api_key') || message.includes('Incorrect API key')) {
-      return Response.json(
-        { error: 'API 키가 유효하지 않습니다.' },
-        { status: 401 },
-      );
-    }
-
     console.error('[chat] Error:', message);
     return Response.json(
-      { error: '서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.' },
+      { error: formatStreamError(error) },
       { status: 500 },
     );
-  } finally {
-    await mcpClient?.close();
   }
 }
