@@ -29,6 +29,7 @@ const translations = {
     reportIssue: '이슈 제보',
     contact: '문의',
     buyCoffee: '개발자에게 커피 사주기',
+    mcpServer: 'MCP 서버 직접 사용하기',
   },
   en: {
     title: 'Welfare Benefits Search',
@@ -50,6 +51,7 @@ const translations = {
     reportIssue: 'Report an issue',
     contact: 'Contact',
     buyCoffee: 'Buy me a coffee',
+    mcpServer: 'Use MCP server directly',
   },
   ja: {
     title: '福祉給付検索',
@@ -71,6 +73,7 @@ const translations = {
     reportIssue: '問題を報告',
     contact: 'お問い合わせ',
     buyCoffee: '開発者にコーヒーをおごる',
+    mcpServer: 'MCPサーバーを直接使う',
   },
   zh: {
     title: '福利搜索',
@@ -92,6 +95,7 @@ const translations = {
     reportIssue: '报告问题',
     contact: '联系我们',
     buyCoffee: '请开发者喝杯咖啡',
+    mcpServer: '直接使用MCP服务器',
   },
 };
 
@@ -110,6 +114,7 @@ export interface Translations {
   reportIssue: string;
   contact: string;
   buyCoffee: string;
+  mcpServer: string;
 }
 
 export function getTranslations(lang: Language): Translations {
