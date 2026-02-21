@@ -69,9 +69,10 @@ export default function ChatInterface() {
       <Header t={t} lang={lang} onLanguageChange={setLang} onReset={handleReset} />
 
       {/* 메시지 영역 */}
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-6">
-          <div className="mx-auto max-w-3xl space-y-4">
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="px-4 py-6">
+            <div className="mx-auto max-w-3xl space-y-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-6 pt-20">
                 <div className="text-center">
@@ -114,13 +115,14 @@ export default function ChatInterface() {
                 )}
               </>
             )}
-            <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} />
+            </div>
           </div>
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
 
-      {/* 입력 영역 */}
-      <div className="border-t border-border bg-background px-4 py-3">
+      {/* 입력 영역 — 하단 고정 */}
+      <div className="shrink-0 border-t border-border bg-background px-4 py-3">
         <form
           onSubmit={handleSubmit}
           className="mx-auto flex max-w-3xl items-end gap-2"
@@ -132,12 +134,12 @@ export default function ChatInterface() {
             placeholder={t.placeholder}
             rows={1}
             disabled={isLoading}
-            className="flex-1 resize-none rounded-xl min-h-0 py-3"
+            className="flex-1 resize-none rounded-xl min-h-0 py-2.5"
           />
           <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="rounded-xl px-4 py-3"
+            className="rounded-xl px-4 h-auto py-2.5"
           >
             {t.send}
           </Button>
