@@ -111,7 +111,7 @@ export default function ChatInterface() {
                 )}
                 {/* 에러를 어시스턴트 채팅 메시지로 표시 */}
                 {errorMessage && (
-                  <MessageBubble role="assistant" content={errorMessage} />
+                  <MessageBubble role="assistant" content={errorMessage} variant="error" />
                 )}
               </>
             )}
