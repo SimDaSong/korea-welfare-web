@@ -27,8 +27,8 @@ export default function ChatInterface() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { messages, setMessages, sendMessage, status } = useChat({
-    onError(error) {
-      setErrorMessage(error.message || t.error);
+    onError() {
+      setErrorMessage(t.error);
     },
   });
   const [input, setInput] = useState('');
