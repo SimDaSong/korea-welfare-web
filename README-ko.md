@@ -64,4 +64,4 @@ npm run dev
 
 ## 라이선스
 
-MIT
+[CC BY-NC 4.0](./LICENSE) — 비상업적 목적에 한해 자유롭게 사용 및 수정 가능합니다.

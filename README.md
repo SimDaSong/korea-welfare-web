@@ -64,4 +64,4 @@ Conversations are not stored. AI responses may be inaccurate — always contact 
 
 ## License
 
-MIT
+[CC BY-NC 4.0](./LICENSE) — Free to use and modify for non-commercial purposes.
