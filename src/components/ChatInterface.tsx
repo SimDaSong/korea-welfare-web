@@ -6,6 +6,10 @@ import MessageBubble from './MessageBubble';
 import SuggestedQuestions from './SuggestedQuestions';
 import Header from './Header';
 import { getTranslations, type Language } from '@/lib/i18n';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /** UIMessage의 parts에서 텍스트를 추출 */
 function getTextFromParts(parts: Array<{ type: string; text?: string }>): string {
@@ -59,75 +63,78 @@ export default function ChatInterface() {
       <Header t={t} lang={lang} onLanguageChange={setLang} />
 
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto max-w-3xl space-y-4">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-6 pt-20">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  {t.heading}
-                </h2>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  {t.subheading}
-                </p>
-              </div>
-              <SuggestedQuestions
-                suggestions={t.suggestions}
-                onSelect={(q) => send(q)}
-              />
-            </div>
-          ) : (
-            <>
-              {messages.map((m) => {
-                const text = getTextFromParts(m.parts as Array<{ type: string; text?: string }>);
-                if (!text) return null;
-                return (
-                  <MessageBubble
-                    key={m.id}
-                    role={m.role as 'user' | 'assistant'}
-                    content={text}
-                  />
-                );
-              })}
-              {status === 'submitted' && (
-                <div className="flex justify-start">
-                  <div className="rounded-2xl bg-gray-100 px-4 py-3 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                    {t.searching}
-                  </div>
+      <ScrollArea className="flex-1">
+        <div className="px-4 py-6">
+          <div className="mx-auto max-w-3xl space-y-4">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-6 pt-20">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold text-foreground">
+                    {t.heading}
+                  </h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {t.subheading}
+                  </p>
                 </div>
-              )}
-              {/* 에러를 어시스턴트 채팅 메시지로 표시 */}
-              {errorMessage && (
-                <MessageBubble role="assistant" content={errorMessage} />
-              )}
-            </>
-          )}
-          <div ref={messagesEndRef} />
+                <SuggestedQuestions
+                  suggestions={t.suggestions}
+                  onSelect={(q) => send(q)}
+                />
+              </div>
+            ) : (
+              <>
+                {messages.map((m) => {
+                  const text = getTextFromParts(m.parts as Array<{ type: string; text?: string }>);
+                  if (!text) return null;
+                  return (
+                    <MessageBubble
+                      key={m.id}
+                      role={m.role as 'user' | 'assistant'}
+                      content={text}
+                    />
+                  );
+                })}
+                {status === 'submitted' && (
+                  <div className="flex justify-start">
+                    <div className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+                      <span>{t.searching}</span>
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                  </div>
+                )}
+                {/* 에러를 어시스턴트 채팅 메시지로 표시 */}
+                {errorMessage && (
+                  <MessageBubble role="assistant" content={errorMessage} />
+                )}
+              </>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </div>
+      </ScrollArea>
 
       {/* 입력 영역 */}
-      <div className="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-950">
+      <div className="border-t border-border bg-background px-4 py-3">
         <form
           onSubmit={handleSubmit}
           className="mx-auto flex max-w-3xl items-end gap-2"
         >
-          <textarea
+          <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t.placeholder}
             rows={1}
             disabled={isLoading}
-            className="flex-1 resize-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            className="flex-1 resize-none rounded-xl min-h-0 py-3"
           />
-          <button
+          <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
+            className="rounded-xl px-4 py-3"
           >
             {t.send}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

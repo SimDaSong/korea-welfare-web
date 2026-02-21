@@ -68,7 +68,7 @@ function formatStreamError(error: unknown): string {
 }
 
 export async function POST(req: Request) {
-  let mcpClient;
+  let mcpClient: Awaited<ReturnType<typeof createMCPClient>> | undefined;
 
   try {
     const { messages: uiMessages, lang = 'ko' } = await req.json();
